@@ -1,6 +1,7 @@
 #!usr/bin/python
 # -*- coding:utf-8 -*-
 
+from sys import argv
 
 class Piece():
     chars = {
@@ -165,8 +166,9 @@ class Game():
 
 class UI():
     
-    def __init__(self):
+    def __init__(self, testmode):
         self.game = Game()
+        self.testmode = testmode
 
     def print_board(self):
         board = self.game.board
@@ -190,6 +192,8 @@ class UI():
 
     def user_input(self, cmd):
         if 'hax' in cmd:
+            if not testmode:
+                return
             asdf,x,y = cmd.split(' ')
             extract = lambda word: (ord(word[:1])- ord("a"), int(word[1:]) -1)#hax:P
             orig = extract(x)
@@ -197,6 +201,8 @@ class UI():
             self.game.hax(orig, dest)
             return 
         if 'castle' in cmd: # castle
+            if ' ' not in cmd:
+                return
             king_side =  cmd.split(' ')[1] == 'king'
             self.game.castle(king_side)
             return
@@ -223,4 +229,6 @@ class UI():
 
 
 if __name__ == '__main__':
-    UI().start()
+    
+    testmode = len(argv) > 1 and argv[1] == 'test'
+    UI(testmode).start()
