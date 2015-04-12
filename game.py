@@ -6,6 +6,9 @@ from piece import Piece
 WHITE = 1
 BLACK = 0
 
+class IllegalMoveError(Exception):
+    pass
+
 class Game():
     
     def __init__(self):
@@ -29,9 +32,8 @@ class Game():
 
     def castle(self, king_side):
         if not self.castle_option[self.turn]:
-            return
-        if not self.path_clear(king_side):
-            return
+            msg = 'Cannot castle, you have already moved your king'
+            raise IllegalMoveError(msg)
         row = 7-self.turn*7
         king_x = 3
         rook_x = 0
@@ -39,7 +41,11 @@ class Game():
         if not king_side:
             rook_x = 7
             king, rook = 5,4
-        #
+        if not self.can_castle(king_x, rook_x, row):
+            name = 'king'
+            if not king_side:
+                name = 'queen'
+            raise IllegalMoveError("Cannot castle on the "+name+" side") 
         self.board[king][row] = self.board[king_x][row]
         self.board[rook][row] = self.board[rook_x][row]
         self.board[king_x][row] = None
@@ -48,7 +54,18 @@ class Game():
         self.castle_option[self.turn] = False
         self.next_turn()
 
-    def path_clear(self, king_side):
+    def checkable(self, a,b):
+        return False
+
+    def can_castle(self, king_x, rook_x, row):
+        step = 1
+        if king_x > rook_x:
+            step = -1
+        for i in range(king_x+step, rook_x, step):
+            if self.board[i][row] != None:
+                return False
+            if (self.checkable(i, row)):
+                return False
         return True
 
     def next_turn(self):
@@ -64,10 +81,9 @@ class Game():
 
     def move(self, orig, dest):
         if self.piece_at(orig) is None:
-            return
+            raise IllegalMoveError('There is no piece there')
         if self.piece_at(orig).color is not self.turn:
-            print "it's not your turn!"
-            return
+            raise IllegalMoveError("The piece at "+orig[0]+","+orig[1]+" is not yours")
         if self.legal_move(orig, dest):
             if self.piece_at(orig).name == 'king':
                 self.castle_option[self.turn] = False
@@ -76,7 +92,7 @@ class Game():
             self.board[orig[0]][orig[1]] = None
             self.next_turn()
         else:
-            print 'illegal move'
+            raise IllegalMoveError("It's not your turn!")
 
     def legal_move(self, orig, dest):
         to_move = self.piece_at(orig)

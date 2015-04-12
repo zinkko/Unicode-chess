@@ -1,6 +1,9 @@
 # -*- coding:UTF-8 -*-
 
-from game import Game
+from game import Game, IllegalMoveError
+
+class InputError(Exception):
+    pass
 
 class UI():
     
@@ -42,7 +45,10 @@ class UI():
             if ' ' not in cmd:
                 return
             king_side =  cmd.split(' ')[1] == 'king'
-            self.game.castle(king_side)
+            try:
+                self.game.castle(king_side)
+            except IllegalMoveError as ex:
+                print ex
             return
         
         if ' ' not in cmd:
@@ -55,7 +61,11 @@ class UI():
         extract = lambda word: (ord(word[:1])- ord("a"), int(word[1:]) -1)#hax:P
         orig = extract(x)
         dest = extract(y)
-        self.game.move(orig, dest)
+
+        try:
+            self.game.move(orig, dest)
+        except IllegalMoveError as ex:
+            print ex
 
     def start(self):
         while True:
