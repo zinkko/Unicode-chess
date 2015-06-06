@@ -29,9 +29,13 @@ class UI():
         print ' ',
         for i in range(8):
             print x[i:i+1],
-        print ''
+        print '\033[10A'
+
+    def clear_line(self):
+        print '\033[1A\r      '
 
     def user_input(self, cmd):
+        self.clear_line()
         if 'hax' in cmd:
             if not testmode:
                 return
@@ -68,6 +72,7 @@ class UI():
             print ex
 
     def start(self):
+        print ''
         while True:
             self.print_board()
             cmd = raw_input()
