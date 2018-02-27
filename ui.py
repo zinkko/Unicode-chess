@@ -31,6 +31,11 @@ class UI():
             print x[i:i+1],
         print '\033[10A'
 
+    def clear_workspace(self):
+        for i in range(11):
+            print '\r\033[K'
+        print '\033[10A'
+
     def clear_lines(self):
         print '\033[2A\r\033[K\n\033[K'
     
@@ -75,8 +80,7 @@ class UI():
             self.show_message(ex)
 
     def start(self):
-        print ''
-        print ''
+        self.clear_workspace()
         while True:
             self.print_board()
             cmd = raw_input()
