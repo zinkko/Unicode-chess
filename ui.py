@@ -31,11 +31,19 @@ class UI():
             print x[i:i+1],
         print '\033[10A'
 
-    def clear_line(self):
-        print '\033[1A\r      '
+    def clear_workspace(self):
+        for i in range(11):
+            print '\r\033[K'
+        print '\033[10A'
+
+    def clear_lines(self):
+        print '\033[2A\r\033[K\n\033[K'
+    
+    def show_message(self, msg):
+        print '\033[2A\r{}\n'.format(msg)
 
     def user_input(self, cmd):
-        self.clear_line()
+        self.clear_lines()
         if 'hax' in cmd:
             if not testmode:
                 return
@@ -52,7 +60,7 @@ class UI():
             try:
                 self.game.castle(king_side)
             except IllegalMoveError as ex:
-                print ex
+                self.show_message(ex)
             return
         
         if ' ' not in cmd:
@@ -69,10 +77,10 @@ class UI():
         try:
             self.game.move(orig, dest)
         except IllegalMoveError as ex:
-            print ex
+            self.show_message(ex)
 
     def start(self):
-        print ''
+        self.clear_workspace()
         while True:
             self.print_board()
             cmd = raw_input()
